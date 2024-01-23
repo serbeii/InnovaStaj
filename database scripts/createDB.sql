@@ -1,0 +1,7 @@
+CREATE DATABASE deneme;
+USE deneme;
+CREATE TABLE user(
+    id SERIAL PRIMARY KEY,
+    username UNIQUE VARCHAR(100) NOT NULL,
+    password CHAR(60) NOT NULL
+);
