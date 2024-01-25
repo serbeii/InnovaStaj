@@ -1,8 +1,9 @@
 package serbeii.staj.service;
 
+import org.springframework.http.ResponseEntity;
 import serbeii.staj.dto.UserDTO;
 
 public interface UserService {
-    boolean register(UserDTO userDTO);
-    boolean login(UserDTO userDTO);
+    ResponseEntity<?> register(UserDTO userDTO);
+    ResponseEntity<?> login(UserDTO userDTO);
 }
