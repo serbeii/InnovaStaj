@@ -51,7 +51,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> login(UserDTO userDTO) {
-        Optional<User> user = userRepository.findByUsername(userDTO.getUsername());
+        Optional<User> user;
+        if (userDTO.isEmailLogin()) {
+            System.out.println("searching mail");
+            user = userRepository.findByEmail(userDTO.getUsername());
+            System.out.println(user);
+        }
+        else {
+            System.out.println("searching username");
+            user = userRepository.findByUsername(userDTO.getUsername());
+            System.out.println(user);
+        }
         if(user.isPresent()) {
             boolean authenticate = passwordEncoder.matches(userDTO.getPassword(),
                     user.map(User::getPassword).orElse(null));
