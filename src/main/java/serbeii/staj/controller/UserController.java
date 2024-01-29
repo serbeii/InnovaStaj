@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import serbeii.staj.dto.UserDTO;
 import serbeii.staj.service.UserService;
 
+import javax.validation.Valid;
+
 
 @CrossOrigin
 @RestController
@@ -14,12 +16,12 @@ public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDTO userDTO){
+    public ResponseEntity<?> register(@RequestBody @Valid UserDTO userDTO){
        return userService.register(userDTO);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> login(@RequestBody @Valid UserDTO userDTO) {
         return userService.login(userDTO);
     }
 
