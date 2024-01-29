@@ -1,4 +1,4 @@
-package serbeii.staj.service.exceptions;
+package serbeii.staj.exception;
 
 public class EmailTakenException extends RuntimeException {
 }

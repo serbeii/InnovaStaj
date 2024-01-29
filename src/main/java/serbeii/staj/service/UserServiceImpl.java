@@ -1,15 +1,17 @@
 package serbeii.staj.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import serbeii.staj.dto.LoginDTO;
 import serbeii.staj.dto.UserDTO;
 import serbeii.staj.entity.User;
+import serbeii.staj.exception.UserNotFoundException;
 import serbeii.staj.repository.UserRepository;
-import serbeii.staj.service.exceptions.EmailTakenException;
-import serbeii.staj.service.exceptions.PasswordMatchError;
-import serbeii.staj.service.exceptions.UsernameTakenException;
+import serbeii.staj.exception.EmailTakenException;
+import serbeii.staj.exception.PasswordMatchError;
+import serbeii.staj.exception.UsernameTakenException;
 
 import java.util.Optional;
 
@@ -48,7 +50,7 @@ public class UserServiceImpl implements UserService {
             user = userRepository.findByUsername(userDTO.getUsername());
         }
         boolean authenticate = passwordEncoder.matches(userDTO.getPassword(),
-                user.map(User::getPassword).orElseThrow());
+                user.map(User::getPassword).orElseThrow(UserNotFoundException::new));
         if (authenticate) {
             LoginDTO loginDTO = new LoginDTO();
             loginDTO.setUsername(user.map(User::getUsername).orElseThrow());

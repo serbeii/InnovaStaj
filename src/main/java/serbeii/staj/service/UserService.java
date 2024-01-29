@@ -1,6 +1,5 @@
 package serbeii.staj.service;
 
-import org.springframework.http.ResponseEntity;
 import serbeii.staj.dto.LoginDTO;
 import serbeii.staj.dto.UserDTO;
 
