@@ -1,11 +1,14 @@
 package serbeii.staj.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import serbeii.staj.dto.LoginDTO;
 import serbeii.staj.dto.UserDTO;
+import serbeii.staj.entity.ERole;
 import serbeii.staj.entity.User;
 import serbeii.staj.exception.UserNotFoundException;
 import serbeii.staj.repository.UserRepository;
@@ -13,7 +16,10 @@ import serbeii.staj.exception.EmailTakenException;
 import serbeii.staj.exception.PasswordMatchError;
 import serbeii.staj.exception.UsernameTakenException;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -38,6 +44,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
+        user.setRoles(new HashSet<>(ERole.ROLE_USER.ordinal()));
         userRepository.save(user);
     }
 
@@ -59,6 +66,23 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new PasswordMatchError();
         }
+    }
+
+
+
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        // TODO:Leş gibi kod lütfen bi şekilde değiştir
+        List<SimpleGrantedAuthority> authorities = user.map(u -> u.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                .collect(Collectors.toList())
+        ).orElseThrow(UserNotFoundException::new);
+        return new org.springframework.security.core.userdetails.User(
+                user.map(User::getUsername).orElseThrow(UserNotFoundException::new),
+                user.map(User::getPassword).orElseThrow(UserNotFoundException::new),
+                authorities
+        );
     }
 }
 
