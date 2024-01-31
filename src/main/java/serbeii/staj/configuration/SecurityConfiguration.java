@@ -1,7 +1,6 @@
 package serbeii.staj.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,11 +11,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import serbeii.staj.configuration.jwt.AuthEntryPointJwt;
 import serbeii.staj.configuration.jwt.AuthTokenFilter;
 import serbeii.staj.configuration.jwt.JwtUtils;
@@ -25,26 +22,21 @@ import serbeii.staj.configuration.jwt.JwtUtils;
 @EnableMethodSecurity
 @EnableWebSecurity
 public class SecurityConfiguration {
-    @Qualifier("userServiceImpl")
-    @Autowired
-    private UserDetailsService userDetailsService;
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final UserDetailsService userDetailsService;
+    private final JwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    public SecurityConfiguration(UserDetailsService userService, JwtUtils jwtUtils, PasswordEncoder passwordEncoder) {
+        this.userDetailsService = userService;
+        this.jwtUtils = jwtUtils;
+        this.passwordEncoder = passwordEncoder;
+    }
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
     }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
-
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -53,6 +45,11 @@ public class SecurityConfiguration {
         authProvider.setPasswordEncoder(passwordEncoder);
 
         return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean

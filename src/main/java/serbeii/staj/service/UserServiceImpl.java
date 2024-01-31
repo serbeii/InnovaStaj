@@ -1,20 +1,22 @@
 package serbeii.staj.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseCookie;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import serbeii.staj.dto.LoginDTO;
 import serbeii.staj.dto.UserDTO;
 import serbeii.staj.entity.ERole;
 import serbeii.staj.entity.User;
-import serbeii.staj.exception.UserNotFoundException;
-import serbeii.staj.repository.UserRepository;
 import serbeii.staj.exception.EmailTakenException;
-import serbeii.staj.exception.PasswordMatchError;
+import serbeii.staj.exception.UserNotFoundException;
 import serbeii.staj.exception.UsernameTakenException;
+import serbeii.staj.repository.UserRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -50,33 +52,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginDTO login(UserDTO userDTO) {
-        Optional<User> user;
+        Optional<User> userOpt;
         if (userDTO.isEmailLogin()) {
-            user = userRepository.findByEmail(userDTO.getUsername());
+            userOpt = userRepository.findByEmail(userDTO.getUsername());
         } else {
-            user = userRepository.findByUsername(userDTO.getUsername());
+            userOpt = userRepository.findByUsername(userDTO.getUsername());
         }
-        boolean authenticate = passwordEncoder.matches(userDTO.getPassword(),
-                user.map(User::getPassword).orElseThrow(UserNotFoundException::new));
-        if (authenticate) {
-            LoginDTO loginDTO = new LoginDTO();
-            loginDTO.setUsername(user.map(User::getUsername).orElseThrow());
-            loginDTO.setId(user.map(User::getId).orElseThrow());
-            return loginDTO;
-        } else {
-            throw new PasswordMatchError();
-        }
-    }
+        passwordEncoder.matches(userDTO.getPassword(),
+                userOpt.map(User::getPassword).orElseThrow(UserNotFoundException::new));
+        User user = userOpt.orElseThrow(UserNotFoundException::new);
 
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getUsername(),
+                user.getPassword()
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        List<String> authorities = getUserRolesString(user);
+        return new LoginDTO(
+                user.getId(),
+                user.getUsername(),
+                authorities
+        );
+    }
 
 
     @Override
     public UserDetails loadUserByUsername(String username) {
         Optional<User> user = userRepository.findByUsername(username);
-        // TODO:Leş gibi kod lütfen bi şekilde değiştir
-        List<SimpleGrantedAuthority> authorities = user.map(u -> u.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
-                .collect(Collectors.toList())
+        List<SimpleGrantedAuthority> authorities = user.map(this::getUserRoles
         ).orElseThrow(UserNotFoundException::new);
         return new org.springframework.security.core.userdetails.User(
                 user.map(User::getUsername).orElseThrow(UserNotFoundException::new),
@@ -84,5 +87,15 @@ public class UserServiceImpl implements UserService {
                 authorities
         );
     }
-}
 
+    private List<SimpleGrantedAuthority> getUserRoles(User user) {
+        return user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                .collect(Collectors.toList());
+    }
+
+    private List<String> getUserRolesString(User user) {
+        return user.getRoles().stream()
+                .map(Object::toString).collect(Collectors.toList());
+    }
+}

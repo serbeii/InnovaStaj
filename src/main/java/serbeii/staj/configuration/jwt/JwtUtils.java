@@ -1,14 +1,15 @@
 package serbeii.staj.configuration.jwt;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.http.ResponseCookie;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
+import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
 import serbeii.staj.dto.UserDTO;
 
 import javax.crypto.SecretKey;
@@ -54,11 +55,14 @@ public class JwtUtils {
     }
 
     private SecretKey key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        //return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        return Jwts.SIG.HS256.key().build();
     }
 
     public boolean validateJwtToken(String authToken) {
         try {
+            System.out.println(8);
+            // TODO: register sırasında error geliyor ama sıkıntı olmaması lazım?
             Jwts.parser().verifyWith(key()).build().parse(authToken);
 //            Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
             return true;
@@ -76,15 +80,6 @@ public class JwtUtils {
     }
 
     public String generateTokenFromUsername(String username) {
-       /*
-            TODO: "description": "The specified key byte array is 80 bits which is not secure enough
-            for any JWT HMAC-SHA algorithm.  The JWT JWA Specification (RFC 7518, Section 3.2)
-            states that keys used with HMAC-SHA algorithms MUST have a size >= 256 bits
-            (the key size must be greater than or equal to the hash output size).
-            Consider using the Jwts.SIG.HS256.key() builder (or HS384.key() or HS512.key())
-            to create a key guaranteed to be secure enough for your preferred HMAC-SHA algorithm.
-            See https://tools.ietf.org/html/rfc7518#section-3.2 for more information."
-        */
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())

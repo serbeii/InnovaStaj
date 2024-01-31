@@ -3,6 +3,8 @@ package serbeii.staj.exception;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,7 +20,7 @@ public class ControllerExceptionHandler {
     @Autowired
     MessageSource messageSource;
 
-    @ExceptionHandler(PasswordMatchError.class)
+    @ExceptionHandler({PasswordMatchError.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorDTO passwordExceptionHandler(PasswordMatchError e, WebRequest request) {
         return new ErrorDTO(
@@ -26,6 +28,16 @@ public class ControllerExceptionHandler {
                 new Date(),
                 "Kullanıcı adı veya şifre hatalı.",
                 request.getDescription(false)
+        );
+    }
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorDTO passwordExceptionAuthHandler(BadCredentialsException e) {
+        return new ErrorDTO(
+                HttpStatus.UNAUTHORIZED.value(),
+                new Date(),
+                "Kullanıcı adı veya şifre hatalı.",
+                e.getMessage()
         );
     }
     @ExceptionHandler(UsernameTakenException.class)
@@ -57,6 +69,16 @@ public class ControllerExceptionHandler {
                 //"Kullanıcı bulunamadı.",
                 messageSource.getMessage("error.usernotfound",null,Locale.getDefault()),
                 request.getDescription(false)
+        );
+    }
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDTO userNotFoundAuthHandler(InternalAuthenticationServiceException e) {
+        return new ErrorDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                new Date(),
+                messageSource.getMessage("error.usernotfound",null,Locale.getDefault()),
+                e.getMessage()
         );
     }
     @ExceptionHandler(Exception.class)
