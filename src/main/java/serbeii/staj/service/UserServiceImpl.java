@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import serbeii.staj.dto.LoginDTO;
 import serbeii.staj.dto.UserDTO;
 import serbeii.staj.entity.ERole;
+import serbeii.staj.entity.Role;
 import serbeii.staj.entity.User;
 import serbeii.staj.exception.EmailTakenException;
 import serbeii.staj.exception.UserNotFoundException;
@@ -67,7 +68,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 user.getPassword()
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        System.out.println(user.getRoles());
         List<String> authorities = getUserRolesString(user);
+        System.out.println(authorities);
         return new LoginDTO(
                 user.getId(),
                 user.getUsername(),
@@ -96,6 +99,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private List<String> getUserRolesString(User user) {
         return user.getRoles().stream()
-                .map(Object::toString).collect(Collectors.toList());
+                .map(role -> role.toString()).collect(Collectors.toList());
     }
 }

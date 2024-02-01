@@ -14,7 +14,8 @@ import serbeii.staj.dto.LoginDTO;
 import serbeii.staj.dto.UserDTO;
 import serbeii.staj.service.UserService;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true",
+        allowedHeaders = "*", exposedHeaders = "set-cookie")
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
@@ -45,7 +46,8 @@ public class UserController {
 
     @PostMapping("/test")
     public void test(HttpServletRequest request){
-        System.out.println("Cookie test: " + jwtUtils.getJwtFromCookies(request));
+        System.out.println("Cookie: " + request.getCookies());
+        System.out.println("Jwt: " + jwtUtils.getJwtFromCookies(request));
     }
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
