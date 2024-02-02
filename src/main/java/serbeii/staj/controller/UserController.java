@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import serbeii.staj.configuration.jwt.JwtUtils;
@@ -45,14 +46,27 @@ public class UserController {
     }
 
     @PostMapping("/test")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void test(HttpServletRequest request){
-        System.out.println("Cookie: " + request.getCookies());
-        System.out.println("Jwt: " + jwtUtils.getJwtFromCookies(request));
+        String token = jwtUtils.getJwtFromCookies(request);
+        System.out.println("user: " + jwtUtils.getUserNameFromJwtToken(token));
+        System.out.println("Jwt: " + token);
     }
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body("You've been signed out!");
+    }
+
+    @GetMapping("/validateLogin")
+    public ResponseEntity<?> validateLogin(HttpServletRequest request) {
+        boolean valid = jwtUtils.validateJwtToken(jwtUtils.getJwtFromCookies(request));
+        if (valid) {
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 }

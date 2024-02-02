@@ -1,9 +1,8 @@
 package serbeii.staj.configuration.jwt;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,16 +56,14 @@ public class JwtUtils {
     }
 
     private SecretKey key() {
-        //return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-        return Jwts.SIG.HS256.key().build();
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+//        return Jwts.SIG.HS256.key().build();
     }
 
     public boolean validateJwtToken(String authToken) {
         try {
-            System.out.println(8);
-            // TODO: register sırasında error geliyor ama sıkıntı olmaması lazım?
-            Jwts.parser().verifyWith(key()).build().parse(authToken);
-//            Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
+            //Jwts.parser().verifyWith(key()).build().parse(authToken);
+            Jwts.parser().verifyWith(key()).build().parseSignedClaims(authToken);
             return true;
         } catch (MalformedJwtException e) {
             System.out.println("Invalid JWT token: {}" + e.getMessage());
@@ -76,9 +73,14 @@ public class JwtUtils {
             System.out.println("JWT token is unsupported: {}" + e.getMessage());
         } catch (IllegalArgumentException e) {
             System.out.println("JWT claims string is empty: {}" + e.getMessage());
+        } catch (JwtException e) {
+            System.out.println("Token is not trustworthy:" + e.getMessage());
         }
 
         return false;
+    }
+    public Claims getClaimsFromToken(String authToken) {
+        return Jwts.parser().verifyWith(key()).build().parseSignedClaims(authToken).getPayload();
     }
 
     public String generateTokenFromUsername(String username) {

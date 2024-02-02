@@ -17,11 +17,13 @@ import serbeii.staj.entity.User;
 import serbeii.staj.exception.EmailTakenException;
 import serbeii.staj.exception.UserNotFoundException;
 import serbeii.staj.exception.UsernameTakenException;
+import serbeii.staj.repository.RoleRepository;
 import serbeii.staj.repository.UserRepository;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +34,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     public void register(UserDTO userDTO) {
@@ -47,7 +51,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
-        user.setRoles(new HashSet<>(ERole.ROLE_USER.ordinal()));
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleRepository.findByName(ERole.ROLE_USER).orElseThrow());
+        user.setRoles(roles);
         userRepository.save(user);
     }
 
@@ -68,9 +74,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 user.getPassword()
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        System.out.println(user.getRoles());
         List<String> authorities = getUserRolesString(user);
-        System.out.println(authorities);
         return new LoginDTO(
                 user.getId(),
                 user.getUsername(),
@@ -81,7 +85,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsername(username)
+                .or(() -> userRepository.findByEmail(username));
         List<SimpleGrantedAuthority> authorities = user.map(this::getUserRoles
         ).orElseThrow(UserNotFoundException::new);
         return new org.springframework.security.core.userdetails.User(
@@ -99,6 +104,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private List<String> getUserRolesString(User user) {
         return user.getRoles().stream()
-                .map(role -> role.toString()).collect(Collectors.toList());
+                .map(role -> role.getName().name()).collect(Collectors.toList());
     }
 }

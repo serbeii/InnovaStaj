@@ -1,6 +1,7 @@
 package serbeii.staj.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import serbeii.staj.entity.ERole;
 import serbeii.staj.entity.Role;
