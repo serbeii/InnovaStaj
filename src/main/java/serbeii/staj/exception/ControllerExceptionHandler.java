@@ -84,6 +84,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDTO globalExceptionHandler(Exception e, WebRequest request) {
+        e.fillInStackTrace();
         return new ErrorDTO(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 new Date(),

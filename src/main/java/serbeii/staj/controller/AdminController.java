@@ -8,6 +8,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import serbeii.staj.configuration.jwt.JwtUtils;
+import serbeii.staj.service.KafkaConsumerService;
+import serbeii.staj.service.KafkaProducerService;
+
+import java.util.List;
 
 @RequestMapping("/api/admin")
 @RestController
@@ -17,6 +21,11 @@ import serbeii.staj.configuration.jwt.JwtUtils;
 public class AdminController {
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private KafkaConsumerService kafkaConsumerService;
+    @Autowired
+    private KafkaProducerService kafkaProducerService;
 
     @GetMapping("/validate")
     public ResponseEntity<?> validateAdmin(HttpServletRequest request) {
@@ -34,12 +43,18 @@ public class AdminController {
         try {
             System.out.println(file.getName() + " " + file.getContentType());
             System.out.println(file);
+            kafkaProducerService.publish(file.getContentType());
             return ResponseEntity.ok().body(null);
         }
         catch (Exception e) {
             e.fillInStackTrace();
             return ResponseEntity.internalServerError().body(e);
         }
+    }
+
+    @GetMapping("/view")
+    public List<?> view() {
+        return kafkaConsumerService.getAllMessages();
     }
 }
 
