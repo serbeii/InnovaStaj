@@ -2,6 +2,7 @@ package serbeii.staj.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +18,15 @@ public class AdminController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    @GetMapping("/test")
-    public ResponseEntity<?> testAdmin(HttpServletRequest request) {
-        System.out.println("tested " + jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request)));
-        return  ResponseEntity.ok(jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwtFromCookies(request)));
+    @GetMapping("/validate")
+    public ResponseEntity<?> validateAdmin(HttpServletRequest request) {
+        boolean valid = jwtUtils.validateJwtToken(jwtUtils.getJwtFromCookies(request));
+        if (valid) {
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PostMapping("/upload")

@@ -18,7 +18,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import serbeii.staj.configuration.jwt.AuthEntryPointJwt;
 import serbeii.staj.configuration.jwt.AuthTokenFilter;
-import serbeii.staj.configuration.jwt.JwtUtils;
 
 @Configuration
 @EnableMethodSecurity
