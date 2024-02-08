@@ -13,7 +13,7 @@ public class KafkaConsumerServiceImpl implements KafkaConsumerService {
     @Override
     @KafkaListener(groupId = "foo", topics = {"staj"})
     public void listen(String message) {
-        synchronized (message) {
+        synchronized (messages) {
             messages.add(message);
         }
     }
@@ -29,6 +29,13 @@ public class KafkaConsumerServiceImpl implements KafkaConsumerService {
     public String getLastMessage() {
         synchronized (messages) {
             return messages.get(messages.size() - 1);
+        }
+    }
+
+    @Override
+    public void emptyMessages() {
+        synchronized (messages) {
+            messages.clear();
         }
     }
 

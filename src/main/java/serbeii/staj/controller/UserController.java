@@ -7,8 +7,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import serbeii.staj.configuration.jwt.JwtUtils;
 import serbeii.staj.dto.LoginDTO;
@@ -27,9 +25,6 @@ public class UserController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    @Autowired
-    AuthenticationManager authenticationManager;
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserDTO userDTO) {
         userService.register(userDTO);
@@ -45,13 +40,6 @@ public class UserController {
                 .body(loginDTO);
     }
 
-    @PostMapping("/test")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public void test(HttpServletRequest request){
-        String token = jwtUtils.getJwtFromCookies(request);
-        System.out.println("user: " + jwtUtils.getUserNameFromJwtToken(token));
-        System.out.println("Jwt: " + token);
-    }
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();

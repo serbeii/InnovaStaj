@@ -50,7 +50,7 @@ public class AdminController {
                 while ((line = reader.readLine()) != null) {
                     kafkaProducerService.publish(line);
                 }
-                kafkaProducerService.publish("=============================================");
+                kafkaProducerService.publish("======================================");
             }
             System.out.println(file.getName() + " " + file.getContentType());
             System.out.println(file);
@@ -69,6 +69,11 @@ public class AdminController {
     @GetMapping("/viewUploaded")
     public String viewUploaded() {
         return kafkaConsumerService.getLastMessage();
+    }
+
+    @DeleteMapping("/emptyMessages")
+    public void emptyMessages(){
+        kafkaConsumerService.emptyMessages();
     }
 }
 
