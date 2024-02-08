@@ -11,6 +11,8 @@ import serbeii.staj.configuration.jwt.JwtUtils;
 import serbeii.staj.service.KafkaConsumerService;
 import serbeii.staj.service.KafkaProducerService;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
 
 @RequestMapping("/api/admin")
@@ -41,9 +43,17 @@ public class AdminController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
+            if (file.getContentType().contains("text")) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+                String line;
+                kafkaProducerService.publish(file.getOriginalFilename());
+                while ((line = reader.readLine()) != null) {
+                    kafkaProducerService.publish(line);
+                }
+                kafkaProducerService.publish("=============================================");
+            }
             System.out.println(file.getName() + " " + file.getContentType());
             System.out.println(file);
-            kafkaProducerService.publish(file.getContentType());
             return ResponseEntity.ok().body(null);
         }
         catch (Exception e) {
@@ -55,6 +65,10 @@ public class AdminController {
     @GetMapping("/view")
     public List<?> view() {
         return kafkaConsumerService.getAllMessages();
+    }
+    @GetMapping("/viewUploaded")
+    public String viewUploaded() {
+        return kafkaConsumerService.getLastMessage();
     }
 }
 

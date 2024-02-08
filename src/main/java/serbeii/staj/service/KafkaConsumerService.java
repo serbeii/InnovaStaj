@@ -8,4 +8,5 @@ import java.util.List;
 public interface KafkaConsumerService {
     void listen(String message);
     List<String> getAllMessages();
+    String getLastMessage();
 }

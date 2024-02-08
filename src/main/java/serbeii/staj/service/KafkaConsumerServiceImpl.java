@@ -24,4 +24,12 @@ public class KafkaConsumerServiceImpl implements KafkaConsumerService {
             return new ArrayList<>(messages);
         }
     }
+
+    @Override
+    public String getLastMessage() {
+        synchronized (messages) {
+            return messages.get(messages.size() - 1);
+        }
+    }
+
 }
