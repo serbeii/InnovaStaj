@@ -1,0 +1,10 @@
+INSERT INTO public.users (id, email, password, username) VALUES (1, 'asd@fgh.co', '$2a$10$uNLwKS8YGExdUSVWyyLRVO.3XKhpu8okg.3JmhgokYZHLZ1UMBb2i', 'asdfgh');
+INSERT INTO public.users (id, email, password, username) VALUES (3, 'asd@fghh.co', '$2a$10$.hNRPtPVjUkgcU3xRfqVvu8w/omqDn3ahTbBj4s7qzjByHpj.LQ4S', 'asd');
+INSERT INTO public.users (id, email, password, username) VALUES (4, 'asdasd@fghh.co', '$2a$10$th851SS46ap0hYTs0IR3YOxpmcB9QIVYEnNtqPFbFgdO92L9WyvuW', 'asdasd');
+INSERT INTO public.users (id, email, password, username) VALUES (5, 'cem@cem.cem', '$2a$10$UtPOnr2YUe2b4cUTX8U1S.57fQQthIuVRDtBFYVAbcnTUy8eo0/0C', 'cem');
+INSERT INTO public.users (id, email, password, username) VALUES (6, 'cem1@cem.cem', '$2a$10$gwgC4s/lnVi8l/8OxsSXyuls.e3KlyxWrGVJ7ic1P7pDmynCMalf2', 'cem1');
+INSERT INTO public.users (id, email, password, username) VALUES (7, 'cem2@cem.cem', '$2a$10$NcJfwHWPUWFzDD34SM091eDqL6VkMPj6whnnX8T3WPZytUrOy3JAy', 'cem2');
+INSERT INTO public.users (id, email, password, username) VALUES (8, 'cem3@cem.cem', '$2a$10$zob8Kt1fpPkVxyDSHFKRv.M8f0uB8dl8aGrf5BYIYyXlcB5mfKQsG', 'cem3');
+INSERT INTO public.users (id, email, password, username) VALUES (9, 'cem4@cem.cem', '$2a$10$S2Xs3YuD57XHw9TiqP/dKuvPcftabYroz8u485oSegTUgydNxbddS', 'cem4');
+INSERT INTO public.users (id, email, password, username) VALUES (10, 'cem5@cem.cem', '$2a$10$rNO3xEPDuSxnUTTRMqe0AuXGZ/sFY0IbduPzDm6OMa/K6WjAI9gLm', 'cem5');
+INSERT INTO public.users (id, email, password, username) VALUES (12, 'cem6@cem.cem', '$2a$10$kHNoo1lB81q5NmbYutWJk.4.sw0giROzvDW2vMmDb/a8iFVh653oG', 'cem6');

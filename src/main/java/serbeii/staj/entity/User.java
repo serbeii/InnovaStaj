@@ -21,10 +21,10 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column(length = 32, nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
+    @Column(length = 60, nullable = false)
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
