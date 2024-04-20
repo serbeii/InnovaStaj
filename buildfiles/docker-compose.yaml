@@ -32,20 +32,3 @@ services:
             KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
             KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    spring:
-        image: spring:1
-        depends_on:
-            - zookeeper
-            - postgres
-            - kafka
-        build:
-            dockerfile: ./Dockerfile
-        environment:
-            - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
-            - spring.datasource.username=postgres
-            - spring.datasource.password=123
-            - spring.kafka.bootstrap-servers=kafka:29092
-        ports:
-            - 8080:8080
-        expose:
-            - 8080:8080

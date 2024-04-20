@@ -11,12 +11,6 @@ create table roles
     name varchar(20) unique check (name in ('ROLE_USER', 'ROLE_ADMIN')),
     primary key (id)
 );
-create table user_roles
-(
-    role_id integer not null,
-    user_id integer not null,
-    primary key (role_id, user_id)
-);
 create table users
 (
     id       serial       not null,
@@ -24,6 +18,12 @@ create table users
     password varchar(60)  not null,
     email    varchar(255) not null unique,
     primary key (id)
+);
+create table user_roles
+(
+    role_id integer not null,
+    user_id integer not null,
+    primary key (role_id, user_id)
 );
 alter table if exists user_roles
     add constraint FKh8ciramu9cc9q3qcqiv4ue8a6 foreign key (role_id) references roles;

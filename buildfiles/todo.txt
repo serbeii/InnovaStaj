@@ -1,0 +1,5 @@
+AUTOMISE THIS!!!!
+1. run this docker compose
+2. mvnw clean install
+3. remove the docker compose images and stuff
+4. run the main docker compose
